@@ -1,4 +1,4 @@
-setwd("/home/jvasquez/Documents/TCGA-lung")
+setwd("/home/jvasquez/Documents/Lung-Cancer/LUAD")
 #FROM:
 ##  HANDS-ON:   NGS ANALYSIS  -->  Quantification files
 ## By Carlos Martínez Mira, Nov-2016

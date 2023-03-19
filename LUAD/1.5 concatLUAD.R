@@ -1,4 +1,4 @@
-setwd("/home/jvasquez/Documents/TCGA-lung")
+setwd("/home/jvasquez/Documents/Lung-Cancer/LUAD")
 #!/usr/bin/env Rscript
 library(data.table)
 subtypeLUAD=read.table("subtypeLUAD.tsv",header=T,sep='\t')

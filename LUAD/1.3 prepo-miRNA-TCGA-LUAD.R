@@ -1,4 +1,4 @@
-setwd("/home/jvasquez/Documents/TCGA-lung")
+setwd("/home/jvasquez/Documents/Lung-Cancer/LUAD")
 library(TCGAbiolinks)
 library(biomaRt)
 

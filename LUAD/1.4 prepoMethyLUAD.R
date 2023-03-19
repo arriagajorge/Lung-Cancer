@@ -1,4 +1,4 @@
-setwd("/home/jvasquez/Documents/TCGA-lung")
+setwd("/home/jvasquez/Documents/Lung-Cancer/LUAD")
 library(TCGAbiolinks)
 library(data.table)
 
@@ -161,6 +161,10 @@ ggplot(temp,aes(x=M))+
   geom_density(aes(fill=subtype,color=subtype,y=..scaled..),
                alpha=0.1)+theme(text=element_text(size=18))
 dev.off()
+# Warning message: The dot-dot notation (`..scaled..`) was deprecated in ggplot2 3.4.0.
+# ℹ Please use `after_stat(scaled)` instead.
+# This warning is displayed once every 8 hours.
+# Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated. 
 #######average duplicates########################################
 m=do.call(cbind,m)
 i=substr(colnames(m),1,19)
