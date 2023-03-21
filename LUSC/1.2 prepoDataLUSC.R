@@ -245,7 +245,7 @@ mydataEDA2 <- newSeqExpressionSet(
   featureData=data.frame(myannot,row.names=myannot$ensembl_gene_id),
   phenoData=data.frame(designExpLUSC,row.names=designExpLUSC$barcode))
 #order for less bias
-gcFull <- withinLaneNormalization(mydataEDA, 
+gcFull <- withinLaneNormalization(mydataEDA2, 
                                   "percentage_gene_gc_content", which = "full")#corrects GC bias 
 lFull <- withinLaneNormalization(gcFull, "length", which = "full")#corrects length bias 
 fullfullTMM <-NOISeq::tmm(normCounts(lFull), long = 1000, lc = 0, k = 0)
@@ -309,7 +309,7 @@ i=lapply(i,function(x) designExpLUSC$barcode[designExpLUSC$samples==x])
 final=exprs(ffTMMARSyn)
 duplis=final[,colnames(final)%in%unlist(i)]
 prefi=final[,!colnames(final)%in%unlist(i)]
-#average duplicates
+#average duplicates ### THERE ARE NOT DUPLICATES EN LUSC
 temp=do.call(cbind,lapply(i,function(x) 
   rowMeans(duplis[,colnames(duplis)%in%x])))
 #identify samples with barcode 
