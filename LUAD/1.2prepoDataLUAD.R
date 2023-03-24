@@ -147,21 +147,21 @@ exprots_hgnc3 <- sapply(exprots_hgnc2, as.numeric)
 rownames(exprots_hgnc3) <- rownames(exprots_hgnc[unique(rownames(exprots_hgnc)),])
 
 #format data for noiseq
-noiseqData = readData(data = exprots_hgnc3,
+noiseqData = NOISeq::readData(data = exprots_hgnc3,
                       gc = myannot[,1:2],
                       biotype = myannot[,c(1,3)],factor=designExpLUAD,
                       length=myannot[,c(1,8)])
-noiseqData2 = readData(data = exprots_hgnc3,
+noiseqData2 = NOISeq::readData(data = exprots_hgnc3,
                       gc = myannot3[,1:2],
                       biotype = myannot3[,c(1,3)],factor=designExpLUAD,
                       length=myannot3[,c(1,8)])
 
 #1)check expression bias per subtype
-mycountsbio = dat(noiseqData, type = "countsbio", factor = "subtype")
+mycountsbio = NOISeq::dat(noiseqData, type = "countsbio", factor = "subtype")
 # [1] "Warning: 249 features with 0 counts in all samples are to be removed for this analysis."
 # [1] "Counts per million distributions are to be computed for:"
 # [1] "normal"        "prox.-inflam"  "prox.-prolif." "TRU"
-mycountsbio2 = dat(noiseqData2, type = "countsbio", factor = "subtype")
+mycountsbio2 = NOISeq::dat(noiseqData2, type = "countsbio", factor = "subtype")
 
 
 #patients with repeated measures
@@ -184,7 +184,7 @@ dev.off()
 #Confidence intervals for the M median is computed by bootstrapping.
 #If the median of M values for each comparison is not in the CI, the deviation
 # of the sample is significant, therefore, normalization is needed 
-mycd = dat(noiseqData2, type = "cd", norm = FALSE) #slooooow
+mycd = NOISeq::dat(noiseqData2, type = "cd", norm = FALSE) #slooooow
 # [1] "Warning: 249 features with 0 counts in all samples are to be removed for this analysis."
 # [1] "Reference sample is: TCGA-64-5781-01A-01R-1628-07"
 # [1] "Diagnostic test: FAILED. Normalization is required to correct this bias."
@@ -199,14 +199,14 @@ dev.off()
 #A cubic spline regression model is fitted. Both the model p-value and the coefficient
 # of determination (R2) are shown. If the model p-value is significant and R2 value is
 # high (more than 70%) the exp,ression depends on the feature
-myGCcontent <- dat(noiseqData2, type = "GCbias", factor = "subtype")
+myGCcontent <- NOISeq::dat(noiseqData2, type = "GCbias", factor = "subtype")
 png("GCbiasOri.png",width=1000)
 par(mfrow=c(1,4))
 sapply(1:4, function(x) explo.plot(myGCcontent, samples = x))
 dev.off()
 #The GC-content of each gene does not change from sample to sample, so it can be expected to
 #have little effect on differential expression analyses to a first approximation
-mylenBias <- dat(noiseqData2, k = 0, type = "lengthbias",
+mylenBias <- NOISeq::dat(noiseqData2, k = 0, type = "lengthbias",
                  factor = "subtype")
 png("lengthbiasOri.png",width=1000)
 par(mfrow=c(1,4))
@@ -215,7 +215,7 @@ dev.off()
 #BUT, since the gene has the same length in all your samples, there is no need to divide by the gene length
 
 #5) check for batch effect
-myPCA = dat(noiseqData2, type = "PCA", norm = F, logtransf = F)
+myPCA = NOISeq::dat(noiseqData2, type = "PCA", norm = F, logtransf = F)
 png("PCA_Ori.png")
 explo.plot(myPCA, samples = c(1,2), plottype = "scores",
            factor = "subtype")
@@ -262,14 +262,14 @@ table(mycd@dat$DiagnosticTest[,  "Diagnostic Test"]) #sometimes change values
 #   161     39
 
 #############################SOLVE BATCH EFFECT#######################################################
-myPCA = dat(noiseqData, type = "PCA", norm = T, logtransf = F)
+myPCA = NOISeq::dat(noiseqData, type = "PCA", norm = T, logtransf = F)
 png("preArsyn.png")
 explo.plot(myPCA, samples = c(1,2), plottype = "scores",
            factor = "subtype")
 dev.off()
 ffTMMARSyn=ARSyNseq(noiseqData, factor = "subtype", batch = F,
                     norm = "n",  logtransf = T)
-myPCA = dat(ffTMMARSyn, type = "PCA", norm = T,logtransf = T)
+myPCA = NOISeq::dat(ffTMMARSyn, type = "PCA", norm = T,logtransf = T)
 png("postArsyn.png")
 explo.plot(myPCA, samples = c(1,2), plottype = "scores", 
            factor = "subtype")
@@ -288,13 +288,13 @@ mycountsbio = NOISeq::dat(noiseqData, type = "countsbio", factor = "subtype",
 png("CountsFinal.png")
 explo.plot(mycountsbio, plottype = "boxplot",samples=1:4)
 dev.off()
-myGCcontent <- dat(noiseqData, k = 0, type = "GCbias", 
+myGCcontent <- NOISeq::dat(noiseqData, k = 0, type = "GCbias", 
                    factor = "subtype",norm=T)
 png("GCbiasFinal.png",width=1000)
 par(mfrow=c(1,4))
 sapply(1:4,function(x) explo.plot(myGCcontent, samples = x))
 dev.off()
-mylenBias <- dat(noiseqData, k = 0, type = "lengthbias", 
+mylenBias <- NOISeq::dat(noiseqData, k = 0, type = "lengthbias", 
                  factor = "subtype",norm=T)
 png("lengthbiasFinal.png",width=1000)
 par(mfrow=c(1,4))

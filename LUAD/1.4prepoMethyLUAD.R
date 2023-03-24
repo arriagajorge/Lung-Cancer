@@ -199,7 +199,10 @@ print({explo.plot(myPCA, samples = c(1,2), plottype = "scores",
 dev.off()
 ### check if we need race and gender? i dont think so
 
-# png("PCA_methy_global_race.png")
-# print({explo.plot(myPCA, samples = c(1,2), plottype = "scores",
-#                   factor = "race")})
-# dev.off()
+png("PCA_methy_global_race.png")
+print({explo.plot(myPCA, samples = c(1,2), plottype = "scores",
+                  factor = "race")})
+dev.off()
+
+print({explo.plot(myPCA, samples = c(1,2), plottype = "scores",
+                  factor = "gender")})
