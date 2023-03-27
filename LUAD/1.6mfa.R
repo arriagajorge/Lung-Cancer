@@ -10,8 +10,8 @@ library(ggplot2)
 
 omic = commandArgs(trailingOnly=TRUE)
 
-#data=fread(paste(omic,"tsv",sep='.'))
-data= fread("CpGs.mtrx")
+data=fread(paste(omic,"mtrx",sep='.'))
+#data= fread("CpGs.mtrx")
 data=t(as.matrix(data[,2:ncol(data)],rownames=data$V1))
 #factominer eats individuals in rows & variables in columns
 

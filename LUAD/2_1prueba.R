@@ -14,13 +14,19 @@ readMtrx <- function(dataTable){
   df <- data.table::fread(dataTable)
   return(as.matrix(df[,2:ncol(df)], rownames=df$V1))
 }
-penalty_cpgs <- readMtrx("CpGs.mtrx")
-penalty_transcripts <- readMtrx("transcripts.mtrx")
-penalty_mir <- readMtrx("miRNAs.mtrx")
 
-head.matrix(penalty_cpgs)
-head.matrix(penalty_transcripts)
-head.matrix(penalty_mir)
+penalty_cpgs <- 0.01
+penalty_transcripts <- 0.01
+penalty_mir <- 0.01
+
+# NOT FOR NOW
+# penalty_cpgs <- readMtrx("CpGs.mtrx")
+# penalty_transcripts <- readMtrx("transcripts.mtrx")
+# penalty_mir <- readMtrx("miRNAs.mtrx")
+
+# head.matrix(penalty_cpgs)
+# head.matrix(penalty_transcripts)
+# head.matrix(penalty_mir)
 
 subtype <- readMtrx("subtypeLUADord.tsv")
 subtype_subtype <- as.factor(subtype[,"subtype"])
@@ -47,9 +53,9 @@ library(mixOmics)
 library(data.table)
 library(parallel)
 
-setwd("/home/jvasquez/Documents/Lung-Cancer/LUAD/multiomics/")
+setwd("/home/jvasquez/Documents/Lung-Cancer/LUAD/Normi/")
 files=list.files()
-# files=files[grep("eigenN",files)]
+files=files[grep("eigenN",files)]
 sizes = c(normal=5, 'prox.-inflam'=69 ,'prox.-prolif'=48,TRU=71)
 sizes
 
@@ -62,9 +68,9 @@ unregister_dopar <- function() {
   rm(list=ls(name=env), pos=env)
 }
 unregister_dopar()
-resus=do.call(rbind,parLapply(cl,1:10,function(x) {
+resus=do.call(rbind,parLapply(cl,1:4,function(x) {
   #1 more than the samples coz of the rownames 
-  i=lapply(sizes,function(x) c(1,sample(2:x,5)))
+  i=lapply(sizes,function(x) c(1,sample(2:x,4)))
   data=lapply(1:4,function(x) fread(files[x],select=i[[x]]))
   data=lapply(data,function(x) as.matrix(x[,2:ncol(x)],rownames=x$V1))
   data=do.call(cbind,data)
@@ -74,5 +80,28 @@ resus=do.call(rbind,parLapply(cl,1:10,function(x) {
   names(data)=c("CpGs","transcripts","miRNAs")
   describe(data,penalty_cpgs,penalty_transcripts,penalty_mir)}))
 stopCluster(cl)
+
+####### per one
+i=lapply(sizes,function(x) c(1,sample(2:x,4)))
+data=lapply(1:4,function(x) fread(files[x],select=i[[x]]))
+data=lapply(data,function(x) as.matrix(x[,2:ncol(x)],rownames=x$V1))
+data=do.call(cbind,data)
+#separate omics
+data=apply(cbind(c(1,417032,427975),c(417031,427974,428180)),1,
+           function(x) data[x[1]:x[2],])
+names(data)=c("CpGs","transcripts","miRNAs")
+describe(data,penalty_cpgs,penalty_transcripts,penalty_mir)
+#######
+
+
+
+
+
+
+
+
+
+
+
 file=paste(penalty_cpgs,penalty_transcripts,penalty_mir,"tsv",sep='.')
 write.table(resus,file,sep='\t',quote=F,row.names=F)
