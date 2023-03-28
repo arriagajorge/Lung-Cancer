@@ -31,6 +31,15 @@ describe=function(data,pc,pt,pm){
   return(description)
 }
 
+transposeData <- function(df){
+  data = list()
+  data[[1]] = t(df[[1]])
+  data[[2]] = t(df[[2]])
+  data[[3]] = t(df[[3]])
+  names(data)=c("CpGs","transcripts","miRNAs")
+  return(data)
+}
+
 library(data.table)
 library(parallel)
 
@@ -48,7 +57,6 @@ data=lapply(1:4,function(x) fread(files[x],select=i[[x]]))
 data=lapply(data,function(x) as.matrix(x[,2:ncol(x)],rownames=x$V1))
 data=do.call(cbind,data)
 
-
 #separate omics
 first_letter <- substr(rownames(data),1 ,1)
 newData = list()
@@ -56,6 +64,7 @@ for (letter in unique(first_letter)) {
   newData[[letter]] <- data[first_letter == letter,] 
 }
 names(newData)=c("CpGs","transcripts","miRNAs")
+
 # confirm separates well
 # head(rownames(newData$CpGs)); tail(rownames(newData$CpGs))
 # head(rownames(newData$transcripts)); tail(rownames(newData$transcripts))
@@ -64,17 +73,28 @@ names(newData)=c("CpGs","transcripts","miRNAs")
 # data=apply(cbind(c(1,417032,427975),c(417031,427974,428180)),1,
 #            function(x) data[x[1]:x[2],])
 
-# transform data for wrapper.sgcca
-transposeData <- function(df){
-  data = list()
-  data[[1]] = t(df[[1]])
-  data[[2]] = t(df[[2]])
-  data[[3]] = t(df[[3]])
-  names(data)=c("CpGs","transcripts","miRNAs")
-  return(data)
-}
-###
-# wr.sg <- wrapper.sgcca(transposeData(newData), penalty = c(penalty_cpgs, penalty_transcripts, penalty_mir),
-#                        scale=T, scheme = 'centroid')
-
 describe(transposeData(newData),penalty_cpgs,penalty_transcripts,penalty_mir)
+descr <- data.frame()
+set.seed(11)
+for (var in 1:10) {
+  # run
+  i=lapply(sizes,function(x) c(1,sample(2:x,4)))
+  data=lapply(1:4,function(x) fread(files[x],select=i[[x]]))
+  data=lapply(data,function(x) as.matrix(x[,2:ncol(x)],rownames=x$V1))
+  data=do.call(cbind,data)
+  
+  #separate omics
+  first_letter <- substr(rownames(data),1 ,1)
+  newData = list()
+  for (letter in unique(first_letter)) {
+    newData[[letter]] <- data[first_letter == letter,] 
+  }
+  names(newData)=c("CpGs","transcripts","miRNAs")
+  
+  descr <- rbind(descr, describe(transposeData(newData),
+                                penalty_cpgs,penalty_transcripts,penalty_mir))
+}
+
+#lapply(1:10, function(x){})
+file=paste(penalty_cpgs,penalty_transcripts,penalty_mir,"tsv",sep='.')
+write.table(descr,file,sep='\t',quote=F,row.names=F)
