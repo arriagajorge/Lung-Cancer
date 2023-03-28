@@ -227,7 +227,7 @@ library(EDASeq)
 #1) filter low count genes.
 #CPM=(counts/fragments sequenced)*one million.
 #Filtering those genes with average CPM below 1, would be different
-#to filtering by those with average counts below 1. 
+#to filtering by those with average counts below 1.
 countMatrixFiltered = filtered.data(exprots_hgnc3, factor = "subtype",
                                     norm = FALSE, depth = NULL, method = 1, cpm = 0, p.adj = "fdr")
 #10943 features are to be kept for differential expression analysis with filtering method 1
@@ -246,7 +246,7 @@ mydataEDA2 <- newSeqExpressionSet(
   featureData=data.frame(myannot,row.names=myannot$ensembl_gene_id),
   phenoData=data.frame(designExpLUAD,row.names=designExpLUAD$barcode))
 #order for less bias
-gcFull <- withinLaneNormalization(mydataEDA, 
+gcFull <- withinLaneNormalization(mydataEDA2, 
                                   "percentage_gene_gc_content", which = "full")#corrects GC bias 
 lFull <- withinLaneNormalization(gcFull, "length", which = "full")#corrects length bias 
 fullfullTMM <-NOISeq::tmm(normCounts(lFull), long = 1000, lc = 0, k = 0)
@@ -275,10 +275,11 @@ explo.plot(myPCA, samples = c(1,2), plottype = "scores",
            factor = "subtype")
 dev.off()
 
-# explo.plot(myPCA, samples = c(1,2), plottype = "scores",
-#            factor = "race")
-# explo.plot(myPCA, samples = c(1,2), plottype = "scores",
-#            factor = "gender")
+explo.plot(myPCA, samples = c(1,2), plottype = "scores",
+            factor = "race")
+explo.plot(myPCA, samples = c(1,2), plottype = "scores",
+            factor = "gender")
+#nothing relevant in the last two pca
 #############################FINAL QUALITY CHECK#######################################################
 noiseqData <- NOISeq::readData(data = exprs(ffTMMARSyn), gc = myannot[,1:2],
                       biotype = myannot[,c(1,3)],factor=designExpLUAD,
@@ -321,13 +322,19 @@ final=cbind(prefi,temp)
 dim(final)
 #[1] 10943  193
 final=final[,order(match(colnames(final),subtypeLUAD$samples))]
-write.table(final,"RNAseqnormalized.tsv",sep='\t',quote=F)
-#duplicates share everything except the plate
-# TCGA-A7-A13D-01A-13R-A12P-07
-# TCGA-A7-A13D-01A-13R-A277-07
-# TCGA-A7-A26E-01A-11R-A277-07
-# TCGA-A7-A26E-01A-11R-A169-07
-# TCGA-A7-A26J-01A-11R-A169-07
-# TCGA-A7-A26J-01A-11R-A277-07
-# TCGA-A7-A13E-01A-11R-A12P-07
-# TCGA-A7-A13E-01A-11R-A277-07
+
+eliminarCerosbyRows <- function(df){
+  vectorCeros = c()
+  for (i in 1:dim(df)[1]) {
+    if (df[i,1]==0) {
+      if(sum(df[i,]) == 0){
+        vectorCeros <- c(vectorCeros, i)
+      }
+    }
+  }
+  return(vectorCeros)
+}
+final2 <- final[-eliminarCerosbyRows(final),]
+dim(final2)
+
+write.table(final2,"RNAseqnormalized.tsv",sep='\t',quote=F)
