@@ -46,18 +46,20 @@ colnames(tpm_unstrandLUAD) <- expreLUADT@colData@rownames
 colnames(fpkm_unstrandLUAD) <- expreLUADT@colData@rownames
 colnames(fpkm_uq_unstrandLUAD) <- expreLUADT@colData@rownames
 
-write.table(fpkm_unstrandLUAD, "RNAseqLUAD.tsv", sep = '\t', quote = F)
+# write.table(fpkm_unstrandLUAD, "RNAseqLUAD.tsv", sep = '\t', quote = F)
+write.table(unstrandedLUAD, "RNAseqLUAD.tsv", sep = '\t', quote = F)
 #stranded_firstLUAD <- cbind(gene_id = expreLUAD$gene_id[1:60660], stranded_firstLUAD)
 #stranded_firstLUAD <- cbind(gene_name = expreLUAD$gene_name[1:60660], stranded_firstLUAD)
 #stranded_firstLUAD <- cbind(gene_type = expreLUAD$gene_type[1:60660], stranded_firstLUAD)
 
 # subtype to duplicates #one only
-i = substr(colnames(fpkm_unstrandLUAD), 1, 19)
+# i = substr(colnames(fpkm_unstrandLUAD), 1, 19)
+i = substr(colnames(unstrandedLUAD), 1, 19)
 j = i[duplicated(i)]
 designExpLUAD=subtypeLUAD[c(which(!subtypeLUAD$samples%in%j),
                     as.numeric(sapply(which(subtypeLUAD$samples%in%j),rep,2))),]
 designExpLUAD=designExpLUAD[order(match(designExpLUAD$samples,substr(colnames(expreLUAD),1,19))),]
-designExpLUAD$barcode=colnames(fpkm_unstrandLUAD)
+designExpLUAD$barcode=colnames(fpkm_unstrandLUAD) # esto no cambia independientemente de con que transcriptoma estemos ocupando
 
 # expreLUAD[,"gene_type"][1:5]
 # colnames(expreLUAD)[1:5]
@@ -104,7 +106,7 @@ myannot$length=abs(myannot$end_position-myannot$start_position)
 myannot=myannot[myannot$gene_biotype=="protein_coding"&
                   myannot$hgnc_symbol!="",]
 myannot=myannot[!duplicated(myannot$ensembl_gene_id),]
-exprots_hgnc=fpkm_unstrandLUAD[rownames(fpkm_unstrandLUAD)%in%myannot$ensembl_gene_id,]
+exprots_hgnc=unstrandedLUAD[rownames(fpkm_unstrandLUAD)%in%myannot$ensembl_gene_id,]
 exprots_hgnc <- exprots_hgnc[,4:ncol(exprots_hgnc)]
 dim(exprots_hgnc)
 #exprots_hgnc[,"gene_id"]
@@ -113,7 +115,7 @@ dim(exprots_hgnc)
 ##check duplicated probes                           xd????
 #myannot[myannot$hgnc_id == myannot$hgnc_id[duplicated(myannot$hgnc_id)],]
 myannot2 <- myannot[unique(rownames(myannot)),]
-dim(myannot2); dim(myannot)
+dim(myannot2); dim(myannot) #same dimension
 # > myannot$hgnc_id[duplicated(myannot$hgnc_id)]
 # [1] "HGNC:30046" "HGNC:11582" "HGNC:33853" "HGNC:4876" 
 which(myannot2$hgnc_id == "HGNC:30046"); which(myannot2$hgnc_id == "HGNC:11582")
@@ -131,7 +133,7 @@ myannot2[c(18566,18728),]; myannot2[c(19327,19336),]
 myannot2[c(12080,19340),]; myannot2[c(7581,19375),]
 
 myannot3 <- myannot2[-c(18728,19327,19340,7581),]
-dim(myannot2); dim(myannot3)
+dim(myannot2); dim(myannot3) #
 # length(unique(rownames(stranded_firstLUAD)))
 # length(unique(rownames(stranded_firstLUAD)))
 # [1] 60616
@@ -258,8 +260,9 @@ noiseqData = NOISeq::readData(data = fullfullTMM, factors=designExpLUAD)
 #cd has to preceed ARSyN or won't work
 mycd=NOISeq::dat(noiseqData,type="cd",norm=TRUE)
 table(mycd@dat$DiagnosticTest[,  "Diagnostic Test"]) #sometimes change values
-#FAILED PASSED 
-#   161     39
+# PASSED 
+# 200 
+# "Diagnostic test: PASSED."
 
 #############################SOLVE BATCH EFFECT#######################################################
 myPCA = NOISeq::dat(noiseqData, type = "PCA", norm = T, logtransf = F)
@@ -320,7 +323,7 @@ colnames(prefi)=substr(colnames(prefi),1,19)
 #joint matrices
 final=cbind(prefi,temp)
 dim(final)
-#[1] 10943  193
+# [1] 11399   193
 final=final[,order(match(colnames(final),subtypeLUAD$samples))]
 
 eliminarCerosbyRows <- function(df){
@@ -337,4 +340,4 @@ eliminarCerosbyRows <- function(df){
 final2 <- final[-eliminarCerosbyRows(final),]
 dim(final2)
 
-write.table(final2,"RNAseqnormalized.tsv",sep='\t',quote=F)
+write.table(final,"RNAseqnormalized.tsv",sep='\t',quote=F)
