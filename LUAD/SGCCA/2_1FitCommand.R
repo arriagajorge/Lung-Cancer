@@ -127,5 +127,5 @@ for (fold in 1:k) {
                                  penalty_cpgs,penalty_transcripts,penalty_mir))
 }
 
-file=paste(penalty_cpgs, penalty_transcripts, penalty_mir, "tsv", sep = '_')
+file=paste(penalty_cpgs, penalty_transcripts, penalty_mir, "tsv", sep = '.')
 write.table(descr, file, sep='\t', quote=F, row.names = F)
