@@ -1,4 +1,6 @@
-Para preprocesar la información ejecutar en el siguiente orden.
+# Preoprocesamiento de la información.
+
+Para replicar el análists ejecutar en el siguiente orden.
 
 1. Ejecutar *1_1getData.R*. La principal función de este archivo es cargar la información. El archivo tendra como output principal el archivo $\texttt{subtypeLUAD.tsv}$
 
@@ -12,22 +14,19 @@ Para preprocesar la información ejecutar en el siguiente orden.
 
 Estos dependen de los subtipos del cáncer con el que estemos trabajando.  **Warning** A día de hoy, 4 de abril 2023. solo correr hasta la línea 55.
 
-6. En la terminal ejcutar los siguientes comandos
+6. En la terminal con el directorio correspondiente ejcutar los siguientes comandos,
 
 ```bash
 Rscript 1.6mfa.R normal
 ```
 
-
 ```bash
 Rscript 1.6mfa.R prox.-inflam
 ```
 
-
 ```bash
 Rscript 1.6mfa.R prox.-prolif.
 ```
-
 
 ```bash
 Rscript 1.6mfa.R TRU
