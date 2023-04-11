@@ -1,6 +1,6 @@
-En el archivo *2_1Fit.R* se ajusta para valores especificos,
+En el archivo *2_1Fit.R* se ajusta para valores especificos.
 
-en el *2_1FitCommands.R* se ajustan para valores dados a través de la linea de comandos,
+En el *2_1FitCommands.R* se ajustan para valores dados a través de la linea de comandos,
 
 suponiendo que se quiere penalizar con los valores 0.1, 0.1, 0.1 el comando será
 ``` bash
