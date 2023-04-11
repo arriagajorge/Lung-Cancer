@@ -4,7 +4,8 @@ Para replicar el análists ejecutar en el siguiente orden.
 
 1. Ejecutar *1_1getData.R*. La principal función de este archivo es cargar la información. El archivo tendra como output principal el archivo $\texttt{subtypeLUAD.tsv}$
 
-2. Ejecutar *1_2Prepo-mRNA-LUAD.R*. La principal función de este archivo es procesar los datos mRNA. El archivo tendra como output pricipal el archivo $\texttt{RNAseqnormalized.tsv}$.
+2. Ejecutar *1_2Prepo-mRNA-LUAD.R*. La principal función de este archivo es procesar los datos mRNA. El archivo tendra como output pricipal el archivo $\texttt{RNAseqnormalized.tsv}$. 
+**Warning** Verificar que la matriz no tenga filas de ceros.
 
 3. Ejecutar *1_3prepo-miRNA-LUAD.R*. La principal función de este archivo es procesar los datos de miRNA. El archivo tendrá como output principal el archivo $\texttt{miRNAseqNormi.tsv}$.
 
