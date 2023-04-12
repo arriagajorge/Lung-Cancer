@@ -95,6 +95,11 @@ penalty1=sapply(slopes1,function(x) grid[which.max(x)+1])
 # miRNAs - 0.01 - 1 - 0.070
 # miRNAs - 0 - 4 - 0.070
 
+# Initial penalties 
+# CpGs - 0.01
+# transcripts - 0.01
+# miRNAs - 0
+
 #######################################PENALTIES SUGGESTED BY PLOTS by SoL
 grid=unique(temp$penalty)
 #slopes=lapply(omics,function(y) sapply(1:(length(grid)-1),function(x) 
