@@ -2,8 +2,8 @@
 
 ########################PARAMETERS & PACKAGES
 args=commandArgs(trailingOnly=TRUE)
-# subtype=args[1]
-setwd("/run/media/jorge/Data/INMEGEN/Lung-Cancer/pruebas/SGCCA")
+#subtype=args
+#setwd("/run/media/jorge/Data/INMEGEN/Lung-Cancer/pruebas/SGCCA")
 
 subtype = "TRU"
 #ncomp=as.numeric(args[2])
@@ -12,7 +12,7 @@ library(igraph)
 library(mixOmics)
 library(data.table)
 ########################DATA
-data=fread(paste("/run/media/jorge/Data/INMEGEN/Lung-Cancer/pruebas/SGCCA",
+data=fread(paste("/home/jarriaga/SGCCA",
                  paste(subtype,"eigenNormi",sep='.'),sep='/'))
 data=as.matrix(data[,2:ncol(data)],rownames=data$V1)
 #separate omics
@@ -23,6 +23,7 @@ for (letter in unique(first_letter)) {
 }
 names(newData)=c("CpGs","transcripts","miRNAs")
 data <- newData
+rm(newData) #remove to free memory
 penalty=c(CpGs=0.01,transcripts=0.01,miRNAs=0)#output of choose_penalty.R
 
 transposeData <- function(df){
@@ -35,6 +36,7 @@ transposeData <- function(df){
 }
 ########################THE SGCCA
 ncomp=nrow(data$miRNAs)-1#the last comp has all loadings>0
+penalty=c(CpGs=0.01,transcripts=0.01,miRNAs=0)
 final=wrapper.sgcca(X=transposeData(data),penalty=penalty,scale=F,
                     scheme="centroid",ncomp=ncomp)#ncomp to explain 50% of transcripts matrix according to mfa.R
 #get selected features
@@ -53,18 +55,31 @@ selected$omic=substr(selected$variable,1,1)
 selected$omic=gsub("E","transcripts",
                    gsub("h","miRNAs",gsub("c","CpGs",selected$omic)))
 selected$final=as.numeric(as.character(selected$final))
+
 png(paste(subtype,"loadings.png",sep='-'))
 ggplot(selected,aes(x=omic,y=final))+
   geom_boxplot()+ylab("loading")+theme(text=element_text(size=18))
 dev.off()
 
-initial=wrapper.sgcca(X=data,penalty=rep(1,3),scale=F,
+## ??
+initial=wrapper.sgcca(X=transposeData(data),penalty=rep(1,3),scale=F,
                       scheme="centroid",ncomp=ncomp)#ncomp to explain 50% of transcripts matrix according to mfa.R
 rbind(rowSums(do.call(rbind,initial$AVE$AVE_X)),
       rowSums(do.call(rbind,final$AVE$AVE_X))) 
-#          CpGs transcripts    miRNAs
-#[1,] 0.7512414   0.5791811 0.5558149
-#[2,] 0.6099801   0.5408933 0.5326386
+#           CpGs transcripts   miRNAs
+# [1,] 2.994470    2.985841 3.052349
+# [2,] 2.977348    2.963901 3.013311
+
+
+# saveRDS(selected, "selected.RDS")
+# saveRDS(initial, "initial.RDS")
+# saveRDS(final, "final.RDS")
+# setwd("/home/jvasquez/Downloads/Eigen-20230413T161434Z-001/Eigen")
+# selected <- readRDS("selected.RDS")
+# final <- readRDS("final.RDS")
+# initial <- readRDS("initial.RDS")
+
+
 selected=lapply(unique(selected$omic),function(x) 
   selected[selected$omic==x,])
 temp=lapply(1:3,function(y) apply(selected[[y]],1,function(x) 
