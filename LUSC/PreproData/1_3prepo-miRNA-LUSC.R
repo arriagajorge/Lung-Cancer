@@ -25,7 +25,7 @@ write.table(mir,"miRNAseq.tsv",sep='\t',quote=F)
 i=substr(colnames(mir),1,19)
 j=i[duplicated(i)]
 designExp=subtypeLUSC[c(which(!subtypeLUSC$samples%in%j),
-                    as.numeric(sapply(which(subtypeLUSC$samples%in%j),rep,2))),]
+                        as.numeric(sapply(which(subtypeLUSC$samples%in%j),rep,2))),]
 designExp=designExp[order(match(designExp$samples,substr(colnames(mir),1,19))),]
 designExp$barcode=colnames(mir)
 
@@ -60,15 +60,15 @@ myannot=myannot[!duplicated(myannot$mirbase_id),]
 library(NOISeq)
 
 noiseqData = NOISeq::readData(data = mir, factor=designExp,
-                      gc=myannot[,c(3,2)],length=myannot[,c(3,6)])
+                              gc=myannot[,c(3,2)],length=myannot[,c(3,6)])
 mycountsbio = NOISeq::dat(noiseqData, type = "countsbio",factor = "subtype")#check low counts
 #distributions
 png("miROri.png")
-explo.plot(mycountsbio, plottype = "boxplot",samples = 1:4)
+explo.plot(mycountsbio, plottype = "boxplot",samples = 1:5)
 dev.off()
 #counts
 png("miRcountsOri.png")
-explo.plot(mycountsbio, plottype = "barplot", samples = 1:4)
+explo.plot(mycountsbio, plottype = "barplot", samples = 1:5)
 dev.off()
 png("miRlowCountThres.png")
 hist(rowMeans(edgeR::cpm(mir,log=T)),ylab="miRNA",
@@ -76,27 +76,27 @@ hist(rowMeans(edgeR::cpm(mir,log=T)),ylab="miRNA",
 dev.off()
 
 #check length & GC bias
-myGCcontent <- dat(noiseqData, k = 0, type = "GCbias",
+myGCcontent <- NOISeq::dat(noiseqData, k = 0, type = "GCbias",
                    factor = "subtype")
 png("miRGCbiasOri.png",width=1000)
-par(mfrow=c(1,4))
-sapply(1:4,function(x) explo.plot(myGCcontent, samples = x))
+par(mfrow=c(1,5))
+sapply(1:5,function(x) explo.plot(myGCcontent, samples = x))
 dev.off()
-mylenBias <- dat(noiseqData, k = 0, type = "lengthbias",
+mylenBias <- NOISeq::dat(noiseqData, k = 0, type = "lengthbias",
                  factor = "subtype")
 png("lengthbiasOri.png",width=1000)
 par(mfrow=c(1,5))
-sapply(1:4,function(x) explo.plot(mylenBias, samples = x))
+sapply(1:5,function(x) explo.plot(mylenBias, samples = x))
 dev.off()
 #no GC bias nor lengthbias!!!!!!!!
 
 myPCA = NOISeq::dat(noiseqData, type = "PCA", norm = FALSE, 
-            logtransf = FALSE)#check batches
+                    logtransf = FALSE)#check batches
 png("miRPCA_Ori.png")
 explo.plot(myPCA, samples = c(1,2), plottype = "scores", 
            factor = "subtype")
 dev.off()
-mycd = dat(noiseqData, type = "cd", norm = FALSE)#check if normalizations is needed
+mycd = NOISeq::dat(noiseqData, type = "cd", norm = FALSE)#check if normalizations is needed
 table(mycd@dat$DiagnosticTest[,  "Diagnostic Test"])
 #[1] "Warning: 368 features with 0 counts in all samples are to be removed for this analysis."
 #FAILED PASSED 
@@ -114,7 +114,7 @@ FilteredMatrix = filtered.data(mir, factor = "subtype",
 #Drago-García2017 used a minimum of  5  counts  in  at  least  25%
 # of  the  samples 
 temp=lapply(unique(designExp$subtype),function(x)   #this was commented
- mir[,colnames(mir)%in%designExp$barcode[designExp$subtype==x]])
+  mir[,colnames(mir)%in%designExp$barcode[designExp$subtype==x]])
 temp1=names(which(table(unlist(sapply(temp,function(x) rownames(x)[rowSums(x>=5)>=ncol(x)*.25])))==5))
 length(temp1)
 # [1] 328
@@ -192,10 +192,10 @@ noiseqData = NOISeq::readData(data = exprs(nobatch),
                               factors=designExp)
 mycountsbio = NOISeq::dat(noiseqData, type = "countsbio",factor = "subtype")#check low counts
 png("miRFinal.png")
-explo.plot(mycountsbio, plottype = "boxplot",samples = 1:4)
+explo.plot(mycountsbio, plottype = "boxplot",samples = 1:5)
 dev.off()
 png("miRcountsFinal.png")
-explo.plot(mycountsbio, plottype = "barplot", samples = 1:4)
+explo.plot(mycountsbio, plottype = "barplot", samples = 1:5)
 dev.off()
 myPCA = NOISeq::dat(noiseqData, type = "PCA", norm = T,logtransf=F)#check batches
 png("miRPCA_Final.png")
@@ -221,6 +221,7 @@ colnames(prefi)=substr(colnames(prefi),1,19)
 #joint matrices
 final=cbind(prefi,temp)
 dim(final)
-#[1] 206  193
+#[1] 244  75
 final=final[,order(match(colnames(final),subtypeLUSC$barcode))]
 write.table(final,"miRNAseqNormi.tsv",sep='\t',quote=F)
+

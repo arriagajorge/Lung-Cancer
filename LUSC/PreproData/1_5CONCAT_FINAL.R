@@ -1,4 +1,4 @@
-setwd("/home/jvasquez/Documents/Lung-Cancer/LUSC")
+setwd("/home/jvasquez/Documents/Lung-Cancer/LUSC/")
 #!/usr/bin/env Rscript
 library(data.table)
 subtypeLUSC=read.table("subtypeLUSC.tsv",header=T,sep='\t')
@@ -19,6 +19,9 @@ names(data)=gsub(".tsv","",names(data))
 names(data)=gsub("RNAseqnormalized","transcripts",
                  gsub("miRNAseqNormi","miRNAs",gsub("methyM","CpGs",names(data))))
 print(sapply(data,dim))
+# CpGs miRNAseq transcripts
+# [1,] 198709      206       10943
+# [2,]    193      193         193
 #print(sapply(data,function(x) head(rownames(x))))
 
 #choose methy order
@@ -29,6 +32,7 @@ subtype=subtypeLUSC[order(match(subtypeLUSC$samples,colnames(data$CpGs))),]
 data[2:3]=lapply(data[2:3],function(x)
   x[,order(match(colnames(x),subtype$samples))])
 print(names(data))
+#"CpGs"        "miRNAseq"    "transcripts"
 
 subtypeLUSC$subtype <- as.factor(subtypeLUSC$subtype)
 #data per subtype
@@ -46,30 +50,13 @@ print(sapply(concatenated,dim))
 # normal prox.-inflam prox.-prolif.    TRU
 # [1,] 428180       428180        428180 428180
 # [2,]      5           69            48     71
-lapply(1:4,function(x) write.table(concatenated[[x]],
+lapply(1:5,function(x) write.table(concatenated[[x]],
                                    paste(names(concatenated)[x],"mtrx",sep='.'),sep='\t',quote=F))
 
-#to go back
-#apply(cbind(c(1,393133,410210),c(393132,410209,410813)),1,
-#	function(x) data[x[1]:x[2],])
-
-#next check PCs per subtype & data→→→→→→→→→→→→→→mfa.R
-#next check inter-omic correlation→→→→→→→corrKernel.R<----optional
-#drop near zero var features???????
-
-###########################
-#join omics
-#!/usr/bin/env Rscript
-#library(data.table)
-files=list.files()
-files=files[grep("mtrx",files)]
-data=lapply(files,fread)
-#data__ <- data[-1]
-# data=lapply(data__,function(x) as.matrix(x[,2:ncol(x)],rownames=x$V1))
-data=lapply(data,function(x) as.matrix(x[,2:ncol(x)],rownames=x$V1))
-data=do.call(cbind,data)
-data_ = data
-data_=apply(cbind(c(1,417032,427975),c(417031,427974,428180)),1,
- function(x) data[x[1]:x[2],])
-names(data_)=c("CpGs","transcripts","miRNAs")
-write.table(data_[[1]],paste(names(data_)[1],"mtrx",sep='.'),sep='\t',quote=F)
+################################ for 1.6
+#run in terminal
+# Rscript 1.6mfa.R classical
+# Rscript 1.6mfa.R secretory
+# Rscript 1.6mfa.R basal
+# Rscript 1.6mfa.R primitive
+# Rscript 1.6mfa.R normal

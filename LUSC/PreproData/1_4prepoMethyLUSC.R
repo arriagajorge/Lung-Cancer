@@ -54,7 +54,7 @@ write.table(methy,"methy.tsv",sep='\t',quote=F)
 i=substr(colnames(methy),1,19)
 j=i[duplicated(i)]
 designMethy=subtypeLUSC[c(which(!subtypeLUSC$samples%in%j),
-                      as.numeric(sapply(which(subtypeLUSC$samples%in%j),rep,2))),1:4]
+                          as.numeric(sapply(which(subtypeLUSC$samples%in%j),rep,2))),1:5]
 #needed coz names are not equal to expression data but barcodes do
 designMethy$barcode=unlist(sapply(designMethy$samples,function(x)
   colnames(methy)[i==x][1]))
@@ -67,7 +67,7 @@ total=table(subtypeLUSC$subtype)
 nas=lapply(names(total),function(x) 
   rowSums(is.na(methy[,designMethy$subtype==x])))
 #keep probes with NA in less than 25% of samples of all subtypes
-i=unique(unlist(lapply(1:4,function(x) which(nas[[x]]<total[x]*.25))))
+i=unique(unlist(lapply(1:5,function(x) which(nas[[x]]<total[x]*.25))))
 methy=methy[i,]
 dim(methy)
 #[1] 417031    844
@@ -136,7 +136,7 @@ library(ggplot2)
 
 #check beta distributions
 temp=lapply(methy,function(x) sample(x,10000))
-temp=as.data.frame(do.call(rbind,lapply(1:4,function(x) 
+temp=as.data.frame(do.call(rbind,lapply(1:5,function(x) 
   cbind(temp[[x]],levels(as.factor(designMethy$subtype))[x]))))
 colnames(temp)=c("beta","subtype")
 temp$beta=as.numeric(as.character(temp$beta))
@@ -152,7 +152,7 @@ mval=function(beta){log2(beta/(1-beta))}
 m=pbapply::pblapply(methy,function(x) apply(x,c(1,2),mval))
 #check M distributions
 temp=lapply(m,function(x) sample(x,10000))
-temp=as.data.frame(do.call(rbind,lapply(1:4,function(x) 
+temp=as.data.frame(do.call(rbind,lapply(1:5,function(x) 
   cbind(temp[[x]],levels(as.factor(designMethy$subtype))[x]))))
 colnames(temp)=c("M","subtype")
 temp$M=as.numeric(as.character(temp$M))

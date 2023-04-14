@@ -14,10 +14,10 @@ library(biomaRt)
 subtypeLUSC=read.table("subtypeLUSC.tsv",header=T, sep="\t")
 
 xprssnLUSC <- GDCquery(project = "TCGA-LUSC",
-                   data.category = "Transcriptome Profiling",
-                   data.type = "Gene Expression Quantification",
-                   workflow.type = "STAR - Counts",
-                   barcode=subtypeLUSC$samples)
+                       data.category = "Transcriptome Profiling",
+                       data.type = "Gene Expression Quantification",
+                       workflow.type = "STAR - Counts",
+                       barcode=subtypeLUSC$samples)
 
 df <- xprssnLUSC[[1]][[1]]
 GDCdownload(xprssnLUSC)
@@ -37,7 +37,7 @@ fpkm_uq_unstrandLUSC <- expreLUSCT@assays@data@listData[["fpkm_uq_unstrand"]]
 # "unstranded" "stranded_f" "stranded_s" "tpm_unstra" "fpkm_unstr" "fpkm_uq_un"
 
 variables_ <- list(stranded_firstLUSC, unstrandedLUSC, stranded_secondLUSC, tpm_unstrandLUSC, 
-                fpkm_unstrandLUSC, fpkm_uq_unstrandLUSC)
+                   fpkm_unstrandLUSC, fpkm_uq_unstrandLUSC)
 
 colnames(stranded_firstLUSC) <- expreLUSCT@colData@rownames
 colnames(unstrandedLUSC) <- expreLUSCT@colData@rownames
@@ -46,18 +46,18 @@ colnames(tpm_unstrandLUSC) <- expreLUSCT@colData@rownames
 colnames(fpkm_unstrandLUSC) <- expreLUSCT@colData@rownames
 colnames(fpkm_uq_unstrandLUSC) <- expreLUSCT@colData@rownames
 
-write.table(fpkm_unstrandLUSC, "RNAseqLUSC.tsv", sep = '\t', quote = F)
+write.table(unstrandedLUSC, "RNAseqLUSC.tsv", sep = '\t', quote = F)
 #stranded_firstLUSC <- cbind(gene_id = expreLUSC$gene_id[1:60660], stranded_firstLUSC)
 #stranded_firstLUSC <- cbind(gene_name = expreLUSC$gene_name[1:60660], stranded_firstLUSC)
 #stranded_firstLUSC <- cbind(gene_type = expreLUSC$gene_type[1:60660], stranded_firstLUSC)
 
 # subtype to duplicates #one only
-i = substr(colnames(fpkm_unstrandLUSC), 1, 19)
+i = substr(colnames(unstrandedLUSC), 1, 19) #have same colnames
 j = i[duplicated(i)]
 designExpLUSC=subtypeLUSC[c(which(!subtypeLUSC$samples%in%j),
-                    as.numeric(sapply(which(subtypeLUSC$samples%in%j),rep,2))),]
+                            as.numeric(sapply(which(subtypeLUSC$samples%in%j),rep,2))),]
 designExpLUSC=designExpLUSC[order(match(designExpLUSC$samples,substr(colnames(expreLUSC),1,19))),]
-designExpLUSC$barcode=colnames(fpkm_unstrandLUSC)
+designExpLUSC$barcode=colnames(unstrandedLUSC)
 
 # expreLUSC[,"gene_type"][1:5]
 # colnames(expreLUSC)[1:5]
@@ -96,7 +96,7 @@ myannot=getBM(attributes = c("ensembl_gene_id",
                              "percentage_gene_gc_content", "gene_biotype",
                              "start_position","end_position","hgnc_id","hgnc_symbol"),
               filters = "ensembl_gene_id", 
-              values=rownames(fpkm_unstrandLUSC),mart=mart) #its valid for every variable
+              values=rownames(unstrandedLUSC),mart=mart) #its valid for every variable
 #que son los espacios en blanco en my annot??
 myannot$length=abs(myannot$end_position-myannot$start_position)
 
@@ -104,7 +104,7 @@ myannot$length=abs(myannot$end_position-myannot$start_position)
 myannot=myannot[myannot$gene_biotype=="protein_coding"&
                   myannot$hgnc_symbol!="",]
 myannot=myannot[!duplicated(myannot$ensembl_gene_id),]
-exprots_hgnc=fpkm_unstrandLUSC[rownames(fpkm_unstrandLUSC)%in%myannot$ensembl_gene_id,]
+exprots_hgnc=unstrandedLUSC[rownames(unstrandedLUSC)%in%myannot$ensembl_gene_id,]
 exprots_hgnc <- exprots_hgnc[,4:ncol(exprots_hgnc)]
 dim(exprots_hgnc)
 #exprots_hgnc[,"gene_id"]
@@ -147,13 +147,13 @@ rownames(exprots_hgnc3) <- rownames(exprots_hgnc[unique(rownames(exprots_hgnc)),
 
 #format data for noiseq
 noiseqData = NOISeq::readData(data = exprots_hgnc3,
-                      gc = myannot[,1:2],
-                      biotype = myannot[,c(1,3)],factor=designExpLUSC,
-                      length=myannot[,c(1,8)])
+                              gc = myannot[,1:2],
+                              biotype = myannot[,c(1,3)],factor=designExpLUSC,
+                              length=myannot[,c(1,8)])
 noiseqData2 = NOISeq::readData(data = exprots_hgnc3,
-                      gc = myannot3[,1:2],
-                      biotype = myannot3[,c(1,3)],factor=designExpLUSC,
-                      length=myannot3[,c(1,8)])
+                               gc = myannot3[,1:2],
+                               biotype = myannot3[,c(1,3)],factor=designExpLUSC,
+                               length=myannot3[,c(1,8)])
 
 #1)check expression bias per subtype
 mycountsbio = NOISeq::dat(noiseqData, type = "countsbio", factor = "subtype")
@@ -165,11 +165,11 @@ mycountsbio2 = NOISeq::dat(noiseqData2, type = "countsbio", factor = "subtype")
 
 #patients with repeated measures
 png("CountsOri.png")
-explo.plot(mycountsbio2, plottype = "boxplot", samples = 1:4)
+explo.plot(mycountsbio2, plottype = "boxplot", samples = 1:5)
 dev.off()
 #2)check for low count genes
 png("lowcountsOri.png")
-explo.plot(mycountsbio2, plottype = "barplot", samples = 1:4)
+explo.plot(mycountsbio2, plottype = "barplot", samples = 1:5)
 dev.off()
 png("lowCountThres.png")
 hist(rowMeans(cpm(exprots_hgnc3,log=T)),ylab="genes",
@@ -183,7 +183,7 @@ dev.off()
 #Confidence intervals for the M median is computed by bootstrapping.
 #If the median of M values for each comparison is not in the CI, the deviation
 # of the sample is significant, therefore, normalization is needed 
-mycd = dat(noiseqData2, type = "cd", norm = FALSE) #slooooow
+mycd = NOISeq::dat(noiseqData2, type = "cd", norm = FALSE) #slooooow
 # [1] "Warning: 249 features with 0 counts in all samples are to be removed for this analysis."
 # [1] "Reference sample is: TCGA-64-5781-01A-01R-1628-07"
 # [1] "Diagnostic test: FAILED. Normalization is required to correct this bias."
@@ -198,23 +198,23 @@ dev.off()
 #A cubic spline regression model is fitted. Both the model p-value and the coefficient
 # of determination (R2) are shown. If the model p-value is significant and R2 value is
 # high (more than 70%) the exp,ression depends on the feature
-myGCcontent <- dat(noiseqData2, type = "GCbias", factor = "subtype")
+myGCcontent <- NOISeq::dat(noiseqData2, type = "GCbias", factor = "subtype")
 png("GCbiasOri.png",width=1000)
-par(mfrow=c(1,4))
-sapply(1:4, function(x) explo.plot(myGCcontent, samples = x))
+par(mfrow=c(1,5))
+sapply(1:5, function(x) explo.plot(myGCcontent, samples = x))
 dev.off()
 #The GC-content of each gene does not change from sample to sample, so it can be expected to
 #have little effect on differential expression analyses to a first approximation
-mylenBias <- dat(noiseqData2, k = 0, type = "lengthbias",
+mylenBias <- NOISeq::dat(noiseqData2, k = 0, type = "lengthbias",
                  factor = "subtype")
 png("lengthbiasOri.png",width=1000)
-par(mfrow=c(1,4))
-sapply(1:4,function(x) explo.plot(mylenBias, samples = x))
+par(mfrow=c(1,5))
+sapply(1:5,function(x) explo.plot(mylenBias, samples = x))
 dev.off()
 #BUT, since the gene has the same length in all your samples, there is no need to divide by the gene length
 
 #5) check for batch effect
-myPCA = dat(noiseqData2, type = "PCA", norm = F, logtransf = F)
+myPCA = NOISeq::dat(noiseqData2, type = "PCA", norm = F, logtransf = F)
 png("PCA_Ori.png")
 explo.plot(myPCA, samples = c(1,2), plottype = "scores",
            factor = "subtype")
@@ -261,14 +261,14 @@ table(mycd@dat$DiagnosticTest[,  "Diagnostic Test"]) #sometimes change values
 #   161     39
 
 #############################SOLVE BATCH EFFECT#######################################################
-myPCA = dat(noiseqData, type = "PCA", norm = T, logtransf = F)
+myPCA = NOISeq::dat(noiseqData, type = "PCA", norm = T, logtransf = F)
 png("preArsyn.png")
 explo.plot(myPCA, samples = c(1,2), plottype = "scores",
            factor = "subtype")
 dev.off()
 ffTMMARSyn=ARSyNseq(noiseqData, factor = "subtype", batch = F,
                     norm = "n",  logtransf = T)
-myPCA = dat(ffTMMARSyn, type = "PCA", norm = T,logtransf = T)
+myPCA = NOISeq::dat(ffTMMARSyn, type = "PCA", norm = T,logtransf = T)
 png("postArsyn.png")
 explo.plot(myPCA, samples = c(1,2), plottype = "scores", 
            factor = "subtype")
@@ -280,24 +280,24 @@ dev.off()
 #            factor = "gender")
 #############################FINAL QUALITY CHECK#######################################################
 noiseqData <- NOISeq::readData(data = exprs(ffTMMARSyn), gc = myannot[,1:2],
-                      biotype = myannot[,c(1,3)],factor=designExpLUSC,
-                      length=myannot[,c(1,8)])
+                               biotype = myannot[,c(1,3)],factor=designExpLUSC,
+                               length=myannot[,c(1,8)])
 mycountsbio = NOISeq::dat(noiseqData, type = "countsbio", factor = "subtype",
-                  norm=T)
+                          norm=T)
 png("CountsFinal.png")
-explo.plot(mycountsbio, plottype = "boxplot",samples=1:4)
+explo.plot(mycountsbio, plottype = "boxplot",samples=1:5)
 dev.off()
-myGCcontent <- dat(noiseqData, k = 0, type = "GCbias", 
+myGCcontent <- NOISeq::dat(noiseqData, k = 0, type = "GCbias", 
                    factor = "subtype",norm=T)
 png("GCbiasFinal.png",width=1000)
-par(mfrow=c(1,4))
-sapply(1:4,function(x) explo.plot(myGCcontent, samples = x))
+par(mfrow=c(1,5))
+sapply(1:5,function(x) explo.plot(myGCcontent, samples = x))
 dev.off()
-mylenBias <- dat(noiseqData, k = 0, type = "lengthbias", 
+mylenBias <- NOISeq::dat(noiseqData, k = 0, type = "lengthbias", 
                  factor = "subtype",norm=T)
 png("lengthbiasFinal.png",width=1000)
-par(mfrow=c(1,4))
-sapply(1:4,function(x) explo.plot(mylenBias, samples = x))
+par(mfrow=c(1,5))
+sapply(1:5,function(x) explo.plot(mylenBias, samples = x))
 dev.off()
 
 #############################RESOLVE DUPLICATES & SAVE##################################################
