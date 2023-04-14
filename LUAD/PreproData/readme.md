@@ -34,3 +34,5 @@ Rscript 1.6mfa.R TRU
 ```
 
 De nueva a cuenta estos comandos dependen de los subtipos del cáncer con el que estemos trabajando.
+
+**Warning** Las librerias $\texttt{NOISeq}$ y $\texttt{data.table}$ tienen ciertos conflictos con las funciones $\texttt{dat}, \texttt{ReadData}$ por lo cual se recomienda verificar que antes de cada una de estas funciones se encuentre ya sea $\texttt{NOISeq::}$ o $\texttt{data.table::}$ antes de ejecutar la respectiva función.
