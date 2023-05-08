@@ -32,6 +32,7 @@ Rscript 1.6mfa.R prox.-prolif.
 ```bash
 Rscript 1.6mfa.R TRU
 ```
+O alternativamente ejecutar *1_6mfa_commands.R* ó *1_6mfa.sh*, esto dara como output archivos $\texttt{normal.eigenNormi}$, $\texttt{prox.-inflam.eigenNormi}$, $\texttt{prox.-prolif..eigenNormi}$, $\texttt{TRU.eigenNormi}$.
 
 De nueva a cuenta estos comandos dependen de los subtipos del cáncer con el que estemos trabajando.
 
