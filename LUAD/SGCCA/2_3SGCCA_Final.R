@@ -2,10 +2,10 @@
 
 ########################PARAMETERS & PACKAGES
 args=commandArgs(trailingOnly=TRUE)
-#subtype=args
+subtype=args
 #setwd("/run/media/jorge/Data/INMEGEN/Lung-Cancer/pruebas/SGCCA")
 
-subtype = "TRU" #"prox.-inflam" #  # "prox.-prolif."
+# subtype = "normal"#"prox.-prolif." #"TRU" #"prox.-inflam" #  
 #ncomp=as.numeric(args[2])
 
 library(igraph)
