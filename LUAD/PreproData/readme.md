@@ -1,4 +1,4 @@
-# Preoprocesamiento de la información.
+# Preprocesamiento de la información.
 
 Para replicar el análists ejecutar en el siguiente orden.
 

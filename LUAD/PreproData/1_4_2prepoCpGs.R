@@ -1,7 +1,8 @@
 setwd("/home/jvasquez/Documents/Lung-Cancer/LUAD/prepo")
 library(tidyverse)
 library(biomaRt)
-methy=read_csv("humanmethylation450_15017482_v1-2.csv",skip=7)
+#downloaded from https://support.illumina.com/downloads/humanmethylation450_15017482_v1-2_product_files.html
+methy=read_csv("humanmethylation450_15017482_v1-2.csv",skip=7) 
 #drop control probes
 methy=methy[grep('^[0-9]',methy$IlmnID,perl=T,invert=T),]
 #only keep probe ID, mapping genes & affected position
