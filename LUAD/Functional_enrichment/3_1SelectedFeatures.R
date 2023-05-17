@@ -16,7 +16,7 @@ files=files[grep("subsampled",files)]#output of joinSubsamples.R
 stability=lapply(files,read_tsv)
 names(stability)=gsub(".subsampled","",files)
 
-#names(stability)==names(sets)#to be sure
+names(stability)==names(sets)#to be sure
 stability=lapply(stability,function(x) as.data.frame(cbind(
   "variable"=x$feature,
   #sum across subsamples
@@ -92,7 +92,7 @@ colnames(myannot)[1]="variable"
 
 
 #add gene lfc
-de=read_tsv("DE.genes.tsv")
+de=read_tsv("DE.genes.tsv") #dont have DE.genes.tsv
 colnames(de)[1:2]=c("variable","subtype")
 de$subtype=gsub("_Normal","",de$subtype)
 topg=merge(top,myannot,by="variable")%>%

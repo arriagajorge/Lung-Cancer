@@ -1,5 +1,4 @@
 #!/usr/bin/env Rscript
-
 setwd("/home/jvasquez/Documents/3_SGCCA")
 library(tidyverse)
 library(biomaRt)

@@ -1,5 +1,6 @@
 setwd("/home/jvasquez/Documents/3_SGCCA")
 
+
 library(tidyverse)
 library(UpSetR)
 
@@ -11,8 +12,8 @@ enriched=list(BP=bp,
 get_sets=function(enriched_table,exclusive){
   
   #matrix subtypes vs function
-  g=g[,-1] ####NO normal tissue
   g=table(unique(enriched_table[,c("ID","subtype")]))
+  #g=g[,-1] ####NO normal tissue
   #to get exclusive functions for another time
   if(exclusive==T){
     g=g[rowSums(g==0)==3,]
@@ -58,6 +59,9 @@ KEGG.classes=as.data.frame(do.call(rbind,lapply(1:4,function(x)
   cbind(names(exclusive$KEGG)[x],exclusive$KEGG[[x]]))))
 colnames(KEGG.classes)=c("subtype","ID")
 KEGG.classes=merge(KEGG.classes,ids,by="ID")
+
+<- function(add, )
+exclusive$KEGG
 
 #get BP categories
 library(GSEABase)
@@ -120,7 +124,7 @@ i=bias(BP.classes,3,4)
 # xlab("")+ylab("")+scale_fill_viridis_d(option = "plasma")
 #dev.off()
 
-png("BPexclusive.png")
+png("BPexclusive.png") 
 BP.classes%>%count(subtype,name)%>%
   ggplot(aes(x=n,y=name,fill=subtype))+
   geom_bar(stat="identity",position="fill")+
