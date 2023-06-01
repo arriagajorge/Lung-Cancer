@@ -2,10 +2,10 @@ setwd("/home/jorge/Downloads/Telegram Desktop")
 
 library(tidyverse)
 groups <- readRDS("groups.RDS")
-names(groups) <- unique(bp$subtype)
 
 bp <- read_tsv("BP.enrichment")
 kegg <- read_tsv("KEGG.enrichment")
+names(groups) <- unique(bp$subtype)
 
 add_cluster <- function(id, subtype, comp, type){
   if(type == "bp"){
