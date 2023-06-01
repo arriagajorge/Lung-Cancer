@@ -1,4 +1,4 @@
-setwd("/home/jvasquez/Documents/Lung-Cancer/LUAD")
+setwd("/run/media/jorge/Data/INMEGEN/SGCCA-main/SGCCA-main-me/")
 #FROM:
 ##  HANDS-ON:   NGS ANALYSIS  -->  Quantification files
 ## By Carlos Martínez Mira, Nov-2016
@@ -46,8 +46,9 @@ colnames(tpm_unstrandLUAD) <- expreLUADT@colData@rownames
 colnames(fpkm_unstrandLUAD) <- expreLUADT@colData@rownames
 colnames(fpkm_uq_unstrandLUAD) <- expreLUADT@colData@rownames
 
-# write.table(fpkm_unstrandLUAD, "RNAseqLUAD.tsv", sep = '\t', quote = F)
+write.table(fpkm_unstrandLUAD, "RNAseqLUAD2.tsv", sep = '\t', quote = F)
 write.table(unstrandedLUAD, "RNAseqLUAD.tsv", sep = '\t', quote = F)
+write.table(designExpLUAD, "RNAdesignexp.tsv", sep = '\t', quote = F)
 #stranded_firstLUAD <- cbind(gene_id = expreLUAD$gene_id[1:60660], stranded_firstLUAD)
 #stranded_firstLUAD <- cbind(gene_name = expreLUAD$gene_name[1:60660], stranded_firstLUAD)
 #stranded_firstLUAD <- cbind(gene_type = expreLUAD$gene_type[1:60660], stranded_firstLUAD)
