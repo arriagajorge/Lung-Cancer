@@ -48,13 +48,17 @@ tfs=tfs%>%separate_rows(target,sep=',',convert=T)%>%
 #################################real miR-transcript edges
 if(length(grep("hsa",features))>0){
   suppressPackageStartupMessages(library(multiMiR))
-  mirIDs=read_tsv("/home/msoledad/param-rm/miR.ids.map.tsv",skip=1,show_col_types=F)
+  mirIDs=read_tsv("/home/mdiaz/workspace/LUSC/selectedfeatures/miR.ids.map.tsv",skip=0,show_col_types=F)
+  mirIDs2 <- mirIDs[,1:10]
+  colnames(mirIDs2)[6]="mature"
   #add precursors as possible regulators
-  temp=mirIDs[,c(1,1)]
-  colnames(temp)[2]="mature"
+  temp=mirIDs2#[,c(6,6)]
+  
   temp$mature=gsub("mir","miR",temp$mature)
-  mirIDs=unique(rbind(mirIDs,temp))
-  mirIDs=mirIDs[mirIDs$precursor%in%features,]
+  mirIDs=unique(rbind(mirIDs2,temp))
+  ##
+  #colnames(mirIDs2)[2] <- "precursor"
+  mirIDs=mirIDs[mirIDs$ID%in%features,]
   #get regulatory interactions with miRNAs in feature set
   miRtargets=get_multimir(mirna=c(mirIDs$mature,features),
                           summary=F,table="validated",legacy.out=F)
@@ -65,7 +69,7 @@ if(length(grep("hsa",features))>0){
   #join all pairs
   reguEdges=mapply(c, methy[,c("IlmnID","target")],
                    tfs[,c("TF","target")],
-                   miRtargets[,c("precursor","target_ensembl")])
+                   miRtargets[,c("ID","target_ensembl")])
 }else{
   print("No miRNAs")	
   reguEdges=mapply(c, methy[,c("IlmnID","target")],
@@ -77,9 +81,9 @@ if(nrow(reguEdges)>0){
   ###########################################get real MI values
   library(infotheo)
   
-  subtype=unlist(strsplit(mi,".",fixed=T))[2]
+  subtype="basal"
   #expression/methylation data
-  data=suppressWarnings(data.table::fread(paste(subtype,"eigeNormi",sep='.')))
+  data=suppressWarnings(data.table::fread(paste(subtype,"eigenNormi",sep='.')))
   data=data[data$V1%in%V(gr)$name,]
   data=as.matrix(data[,2:ncol(data)],rownames=data$V1)
   
