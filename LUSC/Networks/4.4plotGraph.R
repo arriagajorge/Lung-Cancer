@@ -1,14 +1,14 @@
 #!/usr/bin/env Rscript
 setwd("/home/mdiaz/workspace/LUSC/selectedfeatures")
 ########################PARAMETERS & PACKAGES
-net="GO.sort"
+net="GO.filtered.alt"
 library(igraph)
 library(tidyverse)
 library(biomaRt)
 library(RCy3)
 
 edges=read_tsv(net)
-known=read_tsv(gsub("tsv","mtrx.moti",net),col_names=F)
+#known=read_tsv(gsub("tsv","mtrx.moti",net),col_names=F)
 
 #pimp graph
 g=graph.data.frame(edges[,1:2])
@@ -19,31 +19,32 @@ V(g)$size=degree(g)
 #edge size maps corr
 E(g)$width=abs(as.numeric(edges$MI))
 #edge color maps if the interaction is known
-known=graph.data.frame(known[,1:2])
-#(g)$color=edges$X3==1
+#known=graph.data.frame(known[,1:2])2fdf38d7a222e4758b80fd147dd97fa4ac5cdeeb1a64a47d
+#E(g)$color=edges$X3==1
 #node color maps lfc
-subtype=unlist(strsplit(net,".",fixed=T))[2]
-de=read_tsv("../DE.genes.tsv")
-dmir=read_tsv("../DE.miR.tsv")
-dm=read_tsv("../DMcpgs-RUV.tsv")
+subtype="basal"#unlist(strsplit(net,".",fixed=T))[2]
+de=read_tsv("DE.genes.tsv")
+dmir=read_tsv("DE.miR.tsv")
+dm=read_tsv("DMcpgs-RUV.tsv")
 da=list(cpgs=dm,genes=de,mir=dmir)
-colnames(da$genes)[1]="id"
-da=lapply(da,function(x) 
+colnames(da$genes)[2]="id"
+da2=lapply(da,function(x) 
   x[grep(subtype,x$contrast),]%>%filter(id%in%V(g)$name))
-da=data.frame(unique(mapply(rbind,do.call(rbind,lapply(da[2:3],
-                                                       function(x) x[,c("id","logFC","adj.P.Val")])),
-                            da$cpgs[,c(2,7,4)])))#cpgs have different colnames
-da=da[order(match(da$id,V(g)$name)),]
-V(g)$color=as.numeric(da$logFC)
+da3=data.frame(unique(mapply(rbind,do.call(rbind,lapply(da2[2:3],
+                                                        function(x) x[,c("id","logFC","adj.P.Val")])),
+                             da$cpgs[,c(2,7,4)])))#cpgs have different colnames
+da4=da3[order(match(da3$id,V(g)$name)),]
+V(g)$color=as.numeric(da4[1:5,]$logFC)
 
 #get readable names
-methy=read_tsv("../MapMethy.tsv")
+methy=read_tsv("MapMethy.tsv")
 methy=methy%>%filter(IlmnID%in%V(g)$name)
 
 mart=useEnsembl("ensembl",dataset="hsapiens_gene_ensembl",
                 version=105)
 myannot <- getBM(attributes=c('hgnc_symbol','ensembl_gene_id',
                               'entrezgene_id'),mart=mart)
+
 #CpG names
 temp=myannot%>%distinct(hgnc_symbol,entrezgene_id)%>%
   filter(!is.na(entrezgene_id))%>%
@@ -101,18 +102,3 @@ setNodeSizeMapping(table.column="size",
 #setEdgeTargetArrowColorDefault('#737373')
 clearEdgeBends()
 saveSession(filename=paste(paste(unlist(strsplit(net,'.',fixed=T))[1:2],collapse='.'),"cys",sep='.'))
-#closeSession(FALSE)
-
-#a manita
-#fun=unlist(strsplit(net,".",fixed=T))[1]
-#bp=read_tsv("../BP-allFeatures.enrichment")
-#comp=bp%>%filter(ID==fun)%>%dplyr::select(component)%>%unlist
-#bp=bp%>%filter(subtype==subtype&component==comp)
-#features=unique(unlist(strsplit(unlist(bp[grep("negative",bp$Description),c(5,11)][c(2,3,5),2]),"/")))
-#features=c(features,unlist(strsplit(bp$geneID[bp$Description=="T cell selection"],"/")))
-#features=c(features,unlist(strsplit(bp$geneID[bp$Description=="regulation of adaptive immune response based on somatic recombination of immune receptors built from immunoglobulin superfamily domains"],"/")))
-#selectNodes(features,by="label")
-#selectFirstNeighbors()
-#invertNodeSelection()
-#hideSelectedNodes()
-#
