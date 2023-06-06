@@ -5,8 +5,8 @@ library(data.table)
 
 ########################PARAMETERS & PACKAGES
 args=commandArgs(trailingOnly=TRUE)
-fun="GO:1905205"
-subty="secretory"
+fun="GO:0035909"
+subty="basal"
 
 
 #get the components linked to the function
@@ -29,4 +29,4 @@ data=data.table::fread(paste("/home/mdiaz/workspace/LUSC/",paste(subty,"eigenNor
 data=data[data$V1%in%features,]
 write_tsv(data,paste(fun,subty,"mtrx",sep='.'),col_names=F)#needed for puma
 
-write_tsv(data, "probe_secretory.tsv")
+write_tsv(data, "GO.tsv")
