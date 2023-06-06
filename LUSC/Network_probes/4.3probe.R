@@ -4,7 +4,7 @@ setwd("/home/mdiaz/workspace/LUSC/selectedfeatures")
 suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(igraph))
 
-mi="probe_secretory.sort"
+mi="probe_primitive.sort"
 edges=read_tsv(mi,col_names=F,show_col_types=F)
 
 g=graph.data.frame(edges[,1:2],directed=F)
@@ -24,10 +24,10 @@ library(biomaRt)
 methy=read_tsv("/home/mdiaz/workspace/LUSC/selectedfeatures/MapMethy.tsv",show_col_types=F)
 methy=methy%>%filter(IlmnID%in%features)
 mart=useEnsembl("ensembl",dataset="hsapiens_gene_ensembl",
-	version=105)
+                version=105)
 #https://dec2021.archive.ensembl.org
 myannot=getBM(attributes = c("ensembl_gene_id","refseq_ncrna", 
-	"refseq_mrna","mirbase_id"), mart=mart)
+                             "refseq_mrna","mirbase_id"), mart=mart)
 write_tsv(myannot,"myannot")
 myannot=read_tsv("myannot",show_col_types=F)
 methy=myannot%>%pivot_longer(-c(1,4),names_to="type",
@@ -81,7 +81,7 @@ if(nrow(reguEdges)>0){
   ###########################################get real MI values
   library(infotheo)
   
-  subtype="secretory"
+  subtype="primitive"
   #expression/methylation data
   data=suppressWarnings(data.table::fread(paste(subtype,"eigenNormi",sep='.')))
   data=data[data$V1%in%V(gr)$name,]
@@ -110,13 +110,14 @@ if(nrow(reguEdges)>0){
   write_tsv(filtered,file=gsub("sort","filtered",mi))
 }
 #just gonna ignore CpG-CpG pair?????????????????YEP
-edges1=edges%>%filter(type!="cc")
+edges1 = edges %>% filter(type != "cc")
 
 if (nrow(edges1) > 0) {
   edges1 = edges %>% filter(type != "cc")
 } else {
   edges1 = edges %>% filter(type == "cc")
 }
+
 
 #is the MI distri the same across omics?
 #ggplot(edges1,aes(x=MI,col=type))+geom_density(aes(y=..scaled..))+scale_x_continuous(trans="log10")

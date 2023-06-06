@@ -1,13 +1,20 @@
+#!/usr/bin/env Rscript
 setwd("~/workspace/LUSC/selectedfeatures")
 
 library(RCy3)
+library(tidyverse)
 ########################PARAMETERS & PACKAGES
 #net=commandArgs(trailingOnly=TRUE)
-net="GO.filtered.cys"
+net="probe_primitive.filtered.cys"
 #id=unlist(strsplit(net,'.',fixed=T))[1]
 #subty=unlist(strsplit(net,'.',fixed=T))[2]
-id="GO:0035909"
-subty="basal"
+# id="GO:1905205"
+# subty="secretory"
+# id="GO:0002040"
+# subty="classical"
+id="GO:0051084"
+subty="primitive"
+
 
 suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(igraph))
@@ -17,6 +24,7 @@ library(RCy3)
 openSession(net)
 g=createIgraphFromNetwork(subty)
 names=data.frame(cbind("name"=V(g)$name,"label"=V(g)$label))
+names$label
 #######################################3HIGHLIGHT FUNCTIONAL NODES
 #get the cluster that contains the function
 # chosen=read_tsv("../subsamples/chosen.tsv",show_col_types=F)
@@ -24,6 +32,7 @@ chosen=read_tsv("BP.enrichment",show_col_types=F)
 chosen=chosen%>%filter(ID==id&subtype==subty)
 cl=chosen$group
 funs=chosen$Description
+
 
 #get related functions
 groups=read_tsv("Groups_per_component.tsv",show_col_types=F)
@@ -57,13 +66,18 @@ if(nrow(known_genes$KEGG)>0){
 known_genes=known_genes%>%filter(geneID%in%unique(unlist(strsplit(V(g)$label,","))))
 funs=funs[funs%in%known_genes$Description]
 #don't use labels to merge or it'll mess ids
+
+names <- names %>%
+  separate_rows(label, sep = ",") %>%
+  mutate(label = trimws(label))
+
 colnames(known_genes)[2]="label"
-known_genes=merge(known_genes,names,by="label")
+known_genes = merge(known_genes, names, by = "label")
 gk=graph.data.frame(known_genes[,2:3])#funs & names
 #fix labels
 i=known_genes%>%distinct(label,name)
 i=rbind(i,cbind(label=funs,name=funs))
-V(gk)$label=i$label[order(match(i$name,V(gk)$name))]
+V(gk)$label=i$label[order(match(unique(i$name),V(gk)$name))]
 print("Functions net")
 try(createNetworkFromIgraph(gk,"known"))
 #add function annotation
@@ -153,9 +167,3 @@ if(length(query)>0){
                               columns=columns(miRtargets),keytype="type")
   miRtargets[miRtargets$target_symbol%in%names$label,]
 }
-
-########################WHICH TYPE OF EDGES ARE MORE SHARED
-#########################EXCLUSIVE EDGES
-
-#down 1D91C0
-#up E31A1C

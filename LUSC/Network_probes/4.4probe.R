@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 setwd("/home/mdiaz/workspace/LUSC/selectedfeatures")
 ########################PARAMETERS & PACKAGES
-net="GO.filtered.alt"
+net="probe_primitive.filtered.alt"
 library(igraph)
 library(tidyverse)
 library(biomaRt)
@@ -22,7 +22,7 @@ E(g)$width=abs(as.numeric(edges$MI))
 #known=graph.data.frame(known[,1:2])2fdf38d7a222e4758b80fd147dd97fa4ac5cdeeb1a64a47d
 #E(g)$color=edges$X3==1
 #node color maps lfc
-subtype="basal"#unlist(strsplit(net,".",fixed=T))[2]
+subtype="primitive"#unlist(strsplit(net,".",fixed=T))[2]
 de=read_tsv("DE.genes.tsv")
 dmir=read_tsv("DE.miR.tsv")
 dm=read_tsv("DMcpgs-RUV.tsv")
@@ -34,7 +34,11 @@ da3=data.frame(unique(mapply(rbind,do.call(rbind,lapply(da2[2:3],
                                                         function(x) x[,c("id","logFC","adj.P.Val")])),
                              da$cpgs[,c(2,7,4)])))#cpgs have different colnames
 da4=da3[order(match(da3$id,V(g)$name)),]
-V(g)$color=as.numeric(da4[1:5,]$logFC) ##Length of SECRETORY value must be 1 or 8, the number of target vertices, not 5 like in BASAL probe, WHY?
+V(g)$color=as.numeric(da4[1:7,]$logFC) ##Length of SECRETORY value must be 1 or 8, the number of target vertices, not 5 like in BASAL probe, WHY?
+                                       ##Length of CLASSICAL value must be 1 or 5
+                                       ##Length of BASAL value must be 1 or 5
+                                       ##Length of PRIMITIVE value must be 1 or 7
+
 
 #get readable names
 methy=read_tsv("MapMethy.tsv")
@@ -102,4 +106,4 @@ setNodeSizeMapping(table.column="size",
 #setEdgeTargetArrowColorDefault('#737373')
 clearEdgeBends()
 saveSession(filename=paste(paste(unlist(strsplit(net,'.',fixed=T))[1:2],collapse='.'),"cys",sep='.'))
-exportNetwork(gc, file = "Go.filtered.cys")
+exportNetwork(gc, file = "probe_primitive.filtered.cys")
