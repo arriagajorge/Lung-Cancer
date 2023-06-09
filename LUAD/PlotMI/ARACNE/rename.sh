@@ -12,20 +12,23 @@ fi
 # Guardar el nombre original del archivo
 nombre_original="$nombre"
 
+#echo $nombre_original
+
 # Cambiar el nombre del archivo a GO_temp
-mv "$nombre" "GO_temp.mtrx"
+mv "$nombre" "temp.mtrx"
+#echo "El archivo ha sido renombrado a temp.mtrx"
 
-echo "El archivo ha sido renombrado a GO_temp."
-
-#run ARACNE
-bash run.sh GO_temp.mtrx &> salida &
+bash run.sh temp.mtrx &> "${nombre_original%.mtrx}_salida.txt" &
 echo "ARACNE has been run"
 
-# Volver a cambiar el nombre a la versión original
-mv "GO_temp.mtrx" "$nombre_original"
+# esperar a que termine ARACNE
+wait
 
-# Cambiar el nombre del archivo .sort
-mv "GO_temp.sort" "$nombre_original.mtrx"
+#rename el .sif
+mv temp.sif "${nombre_original%.mtrx}.sif"
 
-echo "El archivo ha sido restaurado a su nombre original: $nombre_original."
+# rename el .sort
+mv temp.sort "${nombre_original%.mtrx}.sort"
 
+# rename the matrix temp
+mv temp.mtrx "$nombre_original"
