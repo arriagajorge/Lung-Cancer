@@ -52,8 +52,9 @@ tfs=tfs%>%separate_rows(target,sep=',',convert=T)%>%
 if(length(grep("hsa",features))>0){
   suppressPackageStartupMessages(library(multiMiR))
   mirIDs=read_tsv("/home/msoledad/param-rm/miR.ids.map.tsv",skip=1,show_col_types=F)
+  mirIDs=miRNAs[]
   #add precursors as possible regulators
-  temp=mirIDs[,c(1,1)]
+  temp=mirIDs[,c(4,4)]
   colnames(temp)[2]="mature"
   temp$mature=gsub("mir","miR",temp$mature)
   mirIDs=unique(rbind(mirIDs,temp))
