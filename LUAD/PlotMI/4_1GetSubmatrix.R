@@ -4,7 +4,7 @@ setwd("/home/jvasquez/Documents/3_SGCCA")
 ########################PARAMETERS & PACKAGES
 args=commandArgs(trailingOnly=TRUE)
 fun="GO:0002709"
-subty="prox-inflam" #change names to files from prox.-inflam.... to prox.inflam.... 
+subty="prox-inflam" #change names to files from prox.-inflam.... to prox-inflam.... 
 
 #get the components linked to the function
 if(length(grep("GO",fun))>0){
