@@ -32,3 +32,5 @@ mv temp.sort "${nombre_original%.mtrx}.sort"
 
 # rename the matrix temp
 mv temp.mtrx "$nombre_original"
+
+wait
